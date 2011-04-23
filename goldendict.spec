@@ -1,131 +1,71 @@
-#define distsuffix edm
-%define _requires_exceptions  libtiff.so.4
+Name:		goldendict
+Version:	1.0.1
+Release:	%mkrel 1
+Summary:	A feature-rich dictionary lookup program
+Group:		Applications/System
+License:	GPLv3+
+URL:		http://goldendict.berlios.de/
+Source0:	%{name}-%{version}-src.tar.bz2
 
-Name: 		goldendict
-Version: 	1.0.1
-Release: 	%mkrel 1
-Summary: 	Dictionary Lookup Program
-Summary(ru):	Электронный словарь GoldenDict
-Group:   	Office
-License: 	GPL
-URL:     	http://goldendict.berlios.de
-Source:  	%name-%version-src.tar.bz2
-Source2: 	%{name}_icons.tar.bz2
-BuildRoot: 	%{_tmppath}/%{name}-%{version}-root
+# Modify the Icon section in desktop file to comform package guideline.
 
-BuildRequires:	libhunspell-devel, libqt4-devel, libvorbis-devel, phonon-devel, libqt4-devel, libxtst6-devel
-BuildRequires:	zlib1-devel
+BuildRequires:	qt4-devel
+BuildRequires:	libxtst6-devel
+BuildRequires:	hunspell-devel
+BuildRequires:	libvorbis-devel
+BuildRequires:	desktop-file-utils
+BuildRequires:	phonon-devel
+BuildRequires:  libqtwebkit4
+
 
 %description
-Feature-rich dictionary lookup program.
-    * Use of WebKit for an accurate articles' representation, complete with
-      all formatting, colors, images and links.
-    * Support of multiple dictionary file formats:
-      * Babylon .BGL files
-      * StarDict .ifo/.dict/.idx/.syn dictionaries
-      * Dictd .index/.dict(.dz) dictionary files
-      * ABBYY Lingvo .dsl source files
-      * ABBYY Lingvo .lsa/.dat audio archives
-    * Support for Wikipedia, Wiktionary or any other MediaWiki-based sites
-    * Scan popup functionality. A small window pops up with translation of a
-      word chosen from antoher application.
-    * And much more...
-
-%description -l ru
-
-GoldenDict — свободная оболочка для электронных словарей с открытым исходным кодом, поддерживающая многие форматы словарей ABBYY Lingvo, StarDict, Babylon, Dictd, а также произвольных словарных веб-сайтов (Википедия, Викисловарь и др.).
-
-Особенности:
-
-* Вывод отформатированных статей с ссылками и картинками с помощью движка WebKit.
-* При поиске слов с ошибками используется система морфологии на основе свободной программы для проверки орфографии Hunspell.
-* Индексирование директорий со звуковыми файлами для формирования словарей с произношением слов.
-* При поиске перевода пробелы, знаки пунктуации, диакритические знаки и регистр символов в поисковой фразе не играют роли.
-* При выделении текста появляется всплывающее окно перевода.
-
+Goldendict is a feature-rich dictionary lookup program.
+The latest release has the following features:
+Use of WebKit for an accurate articles' representation;
+Support of multiple dictionary file formats;
+Support MediaWiki-based sites to perform search;
+Scan popup functionality.
 
 %prep
-rm -rf %{buildroot}
-mkdir %{buildroot}
-cd %{buildroot}
-#setup -q -n goldendict
-
-tar --bzip2 -xf %{SOURCE0}
-tar --bzip2 -xf %{SOURCE2}
+%setup -q -c -n goldendict-%{version}-src
 
 %build
-#configure
-qmake
-%make
+# Fix the directory in goldendict.pro by removing apps
+sed -i 's/share\/apps\/goldendict/share\/goldendict/g' goldendict.pro
+# Fix the hunspell directory
+sed -i 's|myspell/dicts|myspell|g' config.cc
+# Fix prefix for /usr 
+sed -i 's/usr\/local/usr/g' goldendict.pro
+%qmake_qt4
+make %{?_smp_mflags}
 
 %install
-
-export DONT_STRIP=1
-
 rm -rf %{buildroot}
+make install INSTALL_ROOT=%{buildroot} INSTALL="install -p"
+rm -rf %{buildroot}/%{_datadir}/app-install
 
-mkdir -p %{buildroot}/opt/%{name}-%{version}
-
-mkdir -p %{buildroot}/usr/bin
-
-mkdir -p %buildroot/%_miconsdir \
-	 %buildroot/%_liconsdir \
-	 %buildroot/%_iconsdir
-	
-#install -m 644 %{name}-16.png %buildroot/%{_miconsdir}/%{name}.png
-#install -m 644 %{name}-32.png %buildroot/%{_iconsdir}/%{name}.png
-#install -m 644 %{name}-48.png %buildroot/%{_liconsdir}/%{name}.png
-
-
-#xdg menu
-mkdir -p $RPM_BUILD_ROOT%{_datadir}/applications
-cat > $RPM_BUILD_ROOT%{_datadir}/applications/%{name}.desktop << EOF
-[Desktop Entry]
-Type=Application
-Terminal=false
-Categories=Office;Dictionary;Education;Qt;Applications
-Name=GoldenDict
-GenericName=Multiformat Dictionary
-GenericName[ru]=Мультиформатный словарь
-Comment=GoldenDict
-Encoding=UTF-8
-Icon=goldendict.png
-Exec=goldendict
-EOF
-
-#make Excutable
-mkdir -p %{buildroot}%{_bindir}
-cat > $RPM_BUILD_ROOT%{_bindir}/%{name} << EOF
-#!/bin/sh
-cd /opt/goldendict-0.9.0
-./goldendict.sh
-cd /
-EOF
-
-chmod 0755 $RPM_BUILD_ROOT%{_bindir}/%{name}
-
-cp -af ./ %{buildroot}/opt/%{name}-%{version}
+# Fix the icon name in desktop file
+sed -i 's/\/usr\/share\/pixmaps\/goldendict\.png/goldendict/g' %{buildroot}/%{_datadir}/applications/goldendict.desktop
+# Fix the categories in desktop file
+desktop-file-install	\
+--add-category="Dictionary"	\
+--remove-category="Education"	\
+--remove-category="Applications"	\
+--delete-original	\
+--dir=%{buildroot}%{_datadir}/applications	\
+%{buildroot}%{_datadir}/applications/goldendict.desktop
+install -d %{buildroot}/%{_datadir}/goldendict/locale
+install -pm 644 locale/*.qm %{buildroot}/%{_datadir}/goldendict/locale
 
 %clean
 rm -rf %{buildroot}
 
-%post
-/sbin/ldconfig
-
-%postun
-/sbin/ldconfig
-
-
 %files
-%defattr(-,root,root,0755)
-%_bindir/%{name}
-%dir /opt/%{name}-%{version}
-/opt/%{name}-%{version}/
-%{_datadir}/applications/%name.desktop
-%{_miconsdir}/%{name}.png
-%{_iconsdir}/%{name}.png
-%{_liconsdir}/%{name}.png
-%{_libdir}/debug/
-
-
-
+%defattr(-,root,root,-)
+%doc LICENSE.txt
+%dir %{_datadir}/goldendict/
+%dir %{_datadir}/goldendict/locale/
+%{_bindir}/goldendict
+%{_datadir}/applications/goldendict.desktop
+%{_datadir}/pixmaps/goldendict.png
+%{_datadir}/goldendict/locale/*.qm
