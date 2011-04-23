@@ -15,8 +15,6 @@ BuildRequires:	hunspell-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	phonon-devel
-BuildRequires:  libqtwebkit4
-
 
 %description
 Goldendict is a feature-rich dictionary lookup program.
