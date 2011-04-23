@@ -1,8 +1,8 @@
 Name:		goldendict
 Version:	1.0.1
-Release:	%mkrel 1
+Release:	%mkrel 2
 Summary:	A feature-rich dictionary lookup program
-Group:		Applications/System
+Group:		Office
 License:	GPLv3+
 URL:		http://goldendict.berlios.de/
 Source0:	%{name}-%{version}-src.tar.bz2
