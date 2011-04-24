@@ -10,7 +10,7 @@ Source0:	%{name}-%{version}-src.tar.bz2
 # Modify the Icon section in desktop file to comform package guideline.
 
 BuildRequires:	qt4-devel
-BuildRequires:	libxtst-devel
+BuildRequires:	xtst-devel
 BuildRequires:	hunspell-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	desktop-file-utils
