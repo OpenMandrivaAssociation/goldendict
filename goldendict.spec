@@ -10,11 +10,16 @@ Source0:	%{name}-%{version}-src.tar.bz2
 # Modify the Icon section in desktop file to comform package guideline.
 
 BuildRequires:	qt4-devel
-BuildRequires:	%{_lib}xtst6-devel
 BuildRequires:	hunspell-devel
 BuildRequires:	libvorbis-devel
 BuildRequires:	desktop-file-utils
 BuildRequires:	phonon-devel
+%if %mdvver <= 201002
+BuildRequires:	%{_lib}xtst6-devel
+%endif
+%if %mdvver >= 201100
+BuildRequires:	libxtst6-devel
+%endif
 
 %description
 Goldendict is a feature-rich dictionary lookup program.
