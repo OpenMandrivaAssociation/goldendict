@@ -6,7 +6,8 @@ Group:		Office
 License:	GPLv3+
 URL:		http://goldendict.berlios.de/
 Source0:	%{name}-%{version}-src.tar.bz2
-
+Source1:	%{name}_icons.tar.bz2
+Patch0:		%{name}.desktop.patch
 # Modify the Icon section in desktop file to comform package guideline.
 
 BuildRequires:	qt4-devel
@@ -31,6 +32,7 @@ Scan popup functionality.
 
 %prep
 %setup -q -c -n goldendict-%{version}-src
+%patch0 -p0
 
 %build
 # Fix the directory in goldendict.pro by removing apps
