@@ -1,26 +1,21 @@
 Name:		goldendict
 Version:	1.0.1
-Release:	%mkrel 3
+Release:	4
 Summary:	A feature-rich dictionary lookup program
 Group:		Office
 License:	GPLv3+
 URL:		http://goldendict.berlios.de/
 Source0:	%{name}-%{version}-src.tar.bz2
-#Source1:	%{name}_icons.tar.bz2
-Patch0:		%{name}.desktop.patch
+Patch0:		goldendict-1.0.1-gcc47.patch
+
 # Modify the Icon section in desktop file to comform package guideline.
 
-BuildRequires:	qt4-devel
-BuildRequires:	hunspell-devel
-BuildRequires:	libvorbis-devel
 BuildRequires:	desktop-file-utils
-BuildRequires:	phonon-devel
-%if %mdvver <= 201002
-BuildRequires:	%{_lib}xtst6-devel
-%endif
-%if %mdvver >= 201100
-BuildRequires:	libxtst6-devel
-%endif
+BuildRequires:	qt4-devel
+BuildRequires:	pkgconfig(hunspell)
+BuildRequires:	pkgconfig(phonon)
+BuildRequires:	pkgconfig(vorbis)
+BuildRequires:	pkgconfig(xtst)
 
 %description
 Goldendict is a feature-rich dictionary lookup program.
@@ -32,20 +27,19 @@ Scan popup functionality.
 
 %prep
 %setup -q -c -n goldendict-%{version}-src
-%patch0 -p0
+%patch0 -p1
 
 %build
 # Fix the directory in goldendict.pro by removing apps
 sed -i 's/share\/apps\/goldendict/share\/goldendict/g' goldendict.pro
 # Fix the hunspell directory
 sed -i 's|myspell/dicts|myspell|g' config.cc
-# Fix prefix for /usr 
+# Fix prefix for /usr
 sed -i 's/usr\/local/usr/g' goldendict.pro
 %qmake_qt4
-make %{?_smp_mflags}
+%make
 
 %install
-rm -rf %{buildroot}
 make install INSTALL_ROOT=%{buildroot} INSTALL="install -p"
 rm -rf %{buildroot}/%{_datadir}/app-install
 
@@ -62,11 +56,7 @@ desktop-file-install	\
 install -d %{buildroot}/%{_datadir}/goldendict/locale
 install -pm 644 locale/*.qm %{buildroot}/%{_datadir}/goldendict/locale
 
-%clean
-rm -rf %{buildroot}
-
 %files
-%defattr(-,root,root,-)
 %doc LICENSE.txt
 %dir %{_datadir}/goldendict/
 %dir %{_datadir}/goldendict/locale/
@@ -74,3 +64,4 @@ rm -rf %{buildroot}
 %{_datadir}/applications/goldendict.desktop
 %{_datadir}/pixmaps/goldendict.png
 %{_datadir}/goldendict/locale/*.qm
+
