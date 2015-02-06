@@ -1,6 +1,6 @@
 Name:		goldendict
 Version:	1.0.1
-Release:	4
+Release:	5
 Summary:	A feature-rich dictionary lookup program
 Group:		Office
 License:	GPLv3+
