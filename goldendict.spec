@@ -4,7 +4,7 @@ Release:	5
 Summary:	A feature-rich dictionary lookup program
 Group:		Office
 License:	GPLv3+
-URL:		http://goldendict.berlios.de/
+URL:		https://goldendict.berlios.de/
 Source0:	%{name}-%{version}-src.tar.bz2
 Patch0:		goldendict-1.0.1-gcc47.patch
 
